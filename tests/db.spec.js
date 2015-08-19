@@ -165,6 +165,14 @@ describe('Tests for db.js:', function () {
                 });
             });
 
+
+
+            request.on('row', function(row) {
+                var arr = _.values(row);
+                //rows is a 2D array
+                table.rows.push(arr);
+            });
+
             request.on('error', function(err) {
                 console.log(err);
             });
@@ -180,7 +188,7 @@ describe('Tests for db.js:', function () {
         var destinationConnection = new sql.Connection(config.connections.destinationDb);
         destinationConnection.connect().then(function () {
 
-            //console.log(table);
+            console.log(table);
 
             var createTableRequest = new sql.Request(destinationConnection);
             createTableRequest.bulk(table, function(err, rowCount) {

@@ -43,13 +43,13 @@ exports.getTrendData = function () {
     var query = 'SELECT top 100' +
         'ti.TradeInID,' +
         'l.LotID,' +
-        'pc.serialnumber,' +
+        //'pc.serialnumber,' +
         'sku.sku,' +
-        'pr.ProfileName,' +
+        //'pr.ProfileName,' +
         'sku.Dept,' +
         'sku.Class,' +
         'sku.SubClass,' +
-        'l.InvType,' +
+        //'l.InvType,' +
         'l.ProdcondID,' +
         'pc.visibleCondID,' +
         'pc.InOriginalBox,' +
