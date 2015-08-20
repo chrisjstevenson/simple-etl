@@ -113,7 +113,7 @@ describe('Tests for db.js:', function () {
             index: 3,
             name: 'sku',
             length: 4,
-            type: [sql.Int],
+            type: sql.VarChar(50),
             scale: undefined,
             precision: undefined,
             nullable: true,
@@ -127,7 +127,7 @@ describe('Tests for db.js:', function () {
 
             var table = new sql.Table('Trend_UnitTest');
             table.create = true;
-            table.columns.add(definition.name, definition.type[0], { nullable: definition.nullable });
+            table.columns.add(definition.name, definition.type, { nullable: definition.nullable });
             table.rows.add(77773434);
 
             var request = new sql.Request(connection);
@@ -143,53 +143,90 @@ describe('Tests for db.js:', function () {
     });
 
 
-    it('should create a table in a destination db with recordset columns', function (done) {
+    //it('should create a table in a destination db with recordset columns', function (done) {
+    //
+    //    this.timeout(10000);
+    //    var table = undefined;
+    //
+    //    var connection = new sql.Connection(config.connections.targetDb);
+    //    connection.connect().then(function () {
+    //        var request = new sql.Request(connection);
+    //        request.stream = true;
+    //        request.query(db.getTrendData());
+    //
+    //        request.on('recordset', function(columns) {
+    //
+    //            table = new sql.Table('Dynamictable_UnitTest');
+    //            table.create = true;
+    //
+    //            var arr = _.values(columns)
+    //            arr.forEach(function(def) {
+    //                table.columns.add(def.name, def.type, { nullable: def.nullable } );
+    //            });
+    //        });
+    //
+    //
+    //        request.on('row', function(row) {
+    //            var arr = _.values(row);
+    //            //rows is a 2D array
+    //            table.rows.push(arr);
+    //        });
+    //
+    //        request.on('error', function(err) {
+    //            console.log(err);
+    //        });
+    //
+    //        request.on('done', function(returnValue) {
+    //        });
+    //
+    //    }).catch(function (err) {
+    //        console.log(err);
+    //    });
+    //
+    //
+    //    var destinationConnection = new sql.Connection(config.connections.destinationDb);
+    //    destinationConnection.connect().then(function () {
+    //
+    //        //console.log(table);
+    //
+    //        var createTableRequest = new sql.Request(destinationConnection);
+    //        createTableRequest.bulk(table, function(err, rowCount) {
+    //            //if (err) console.log(err);
+    //            done();
+    //        });
+    //
+    //    }).catch(function (err) {
+    //        //console.log(err);
+    //    });
+    //});
 
-        this.timeout(10000);
+
+    it('should create table from recordset', function(done) {
+
         var table = undefined;
-
         var connection = new sql.Connection(config.connections.targetDb);
         connection.connect().then(function () {
             var request = new sql.Request(connection);
-            request.stream = true;
-            request.query(db.getTrendData());
+            var query = db.getTrendData();
 
-            request.on('recordset', function(columns) {
+            request.query(query).then(function (recordset) {
+                var temp = recordset.toTable();
+                table = new sql.Table('dynamicTableTest');
+                table.colums = temp.columns;
+                table.rows = temp.rows;
 
-                table = new sql.Table('Dynamictable_UnitTest');
-                table.create = true;
-
-                var arr = _.values(columns)
-                arr.forEach(function(def) {
-                    table.columns.add(def.name, def.type, { nullable: def.nullable } );
-                });
+            }).catch(function (err) {
+                logger.error(err);
             });
-
-
-
-            request.on('row', function(row) {
-                var arr = _.values(row);
-                //rows is a 2D array
-                table.rows.push(arr);
-            });
-
-            request.on('error', function(err) {
-                console.log(err);
-            });
-
-            request.on('done', function(returnValue) {
-            });
-
         }).catch(function (err) {
-            console.log(err);
+            logger.error(err);
         });
 
 
         var destinationConnection = new sql.Connection(config.connections.destinationDb);
         destinationConnection.connect().then(function () {
 
-            console.log(table);
-
+            //console.log(table);
             var createTableRequest = new sql.Request(destinationConnection);
             createTableRequest.bulk(table, function(err, rowCount) {
                 if (err) console.log(err);
@@ -197,13 +234,24 @@ describe('Tests for db.js:', function () {
             });
 
         }).catch(function (err) {
-            console.log(err);
+            //console.log(err);
         });
 
 
     });
+
+
 });
 
+
+function convertDataType(definition) {
+
+    if(definition.type.declaration.localeCompare('varchar') == 0) {
+        return sql.VarChar(sql.MAX);
+    } else {
+        return definition.type;
+    }
+};
 
 
 // Notes:

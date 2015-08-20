@@ -43,13 +43,13 @@ exports.getTrendData = function () {
     var query = 'SELECT top 100' +
         'ti.TradeInID,' +
         'l.LotID,' +
-        //'pc.serialnumber,' +
+        'pc.serialnumber,' +
         'sku.sku,' +
-        //'pr.ProfileName,' +
+        "pr.ProfileID," +
         'sku.Dept,' +
         'sku.Class,' +
         'sku.SubClass,' +
-        //'l.InvType,' +
+        'l.InvType,' +
         'l.ProdcondID,' +
         'pc.visibleCondID,' +
         'pc.InOriginalBox,' +
@@ -57,8 +57,8 @@ exports.getTrendData = function () {
         'p.PaymentAmount,' +
         'ti.QuoteTotal,' +
         //'ti.TestedTotal,' +
-        'ii.SalePrice,' +
-        'ih.ShipDate ' +
+        'ii.SalePrice ' +
+        //'ih.ShipDate ' +
     'FROM dbo.AM_Lots AS l ' +
     'LEFT OUTER JOIN dbo.AM_InvoiceItems AS ii ON l.LotID = ii.LotID ' +
     'LEFT OUTER JOIN dbo.AM_InvoiceHeader AS ih ON ii.InvoiceID = ih.InvoiceID ' +
