@@ -202,7 +202,7 @@ describe('Tests for db.js:', function () {
 
 
     it('should create table from recordset', function(done) {
-
+        this.timeout(20000);
         var table = undefined;
         var connection = new sql.Connection(config.connections.targetDb);
         connection.connect().then(function () {
