@@ -38,18 +38,18 @@ exports.promiseTest = function () {
 };
 
 
-exports.getTrendData = function () {
+exports.getTrendDataForTesting = function () {
 
-    var query = 'SELECT top 100' +
+    var query = 'SELECT TOP 100' +
         'ti.TradeInID,' +
         'l.LotID,' +
-        'pc.serialnumber,' +
+        //'pc.serialnumber,' +
         'sku.sku,' +
         "pr.ProfileID," +
         'sku.Dept,' +
         'sku.Class,' +
         'sku.SubClass,' +
-        'l.InvType,' +
+        //'l.InvType,' +
         'l.ProdcondID,' +
         'pc.visibleCondID,' +
         'pc.InOriginalBox,' +
@@ -75,6 +75,43 @@ exports.getTrendData = function () {
     return query;
 }
 
+
+exports.getTrendData = function () {
+
+    var query = 'SELECT ' +
+        'ti.TradeInID,' +
+        'l.LotID,' +
+            //'pc.serialnumber,' +
+        'sku.sku,' +
+        "pr.ProfileID," +
+        'sku.Dept,' +
+        'sku.Class,' +
+        'sku.SubClass,' +
+            //'l.InvType,' +
+        'l.ProdcondID,' +
+        'pc.visibleCondID,' +
+        'pc.InOriginalBox,' +
+        'Days_In_Warehouse = DATEDIFF(DAY, ti.DateQuoted, ih.ShipDate),' +
+        'p.PaymentAmount,' +
+        'ti.QuoteTotal,' +
+            //'ti.TestedTotal,' +
+        'ii.SalePrice ' +
+            //'ih.ShipDate ' +
+        'FROM dbo.AM_Lots AS l ' +
+        'LEFT OUTER JOIN dbo.AM_InvoiceItems AS ii ON l.LotID = ii.LotID ' +
+        'LEFT OUTER JOIN dbo.AM_InvoiceHeader AS ih ON ii.InvoiceID = ih.InvoiceID ' +
+        'LEFT OUTER JOIN dbo.AM_TradeInLots AS tl ON l.LotID = tl.LotID ' +
+        'LEFT OUTER JOIN dbo.AM_TradeIn AS ti ON tl.TradeInID = ti.TradeInID ' +
+        'LEFT OUTER JOIN dbo.AM_TradeInPayments AS p ON ti.TradeInID = p.TradeInID ' +
+        'INNER JOIN dbo.BBSKUData sku ON l.ConsignorSKU = sku.SKU ' +
+        'LEFT OUTER JOIN dbo.AM_Profile pr ON l.ProfileID = pr.ProfileID ' +
+        'LEFT JOIN AM_ProductCondition pc ON l.LotID = pc.LotID ' +
+        'WHERE ' +
+        "ti.DateQuoted > '1/1/2015'" +
+        'AND ii.SalePrice IS NOT NULL';
+
+    return query;
+}
 
 exports.createLotIdQuery = function (lotId) {
 
